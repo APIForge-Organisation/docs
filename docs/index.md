@@ -30,6 +30,10 @@ features:
     title: Automatic insights
     details: Plain-language alerts generated from your traffic — no dashboards to configure. Anomaly detection, dead endpoint identification, before/after release comparison.
 
+  - icon: ☁️
+    title: Cloud mode — optional
+    details: Send metrics to the APIForge SaaS instead of storing locally. One extra parameter, no infrastructure to manage. Your local mode setup works unchanged.
+
   - icon: 🟢
     title: Node.js SDK — apiforgejs
     details: Drop-in Express.js middleware. Requires Node.js ≥ 22.5. Install via npm.

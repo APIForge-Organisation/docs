@@ -2,6 +2,10 @@
 
 The local dashboard is a built-in web UI served automatically by the SDK on port 4242 (configurable). It is identical across all SDKs — the same interface whether you run Node.js or Python.
 
+::: info Cloud mode
+In cloud mode, the local dashboard is not started. Metrics are visualized in the APIForge cloud dashboard instead. See [Cloud Mode](/guide/cloud-mode).
+:::
+
 ```
 http://localhost:4242
 ```
@@ -53,11 +57,11 @@ See [Automatic Insights](/features/insights).
 ::: code-group
 
 ```js [Node.js]
-app.use(apiforge({ mode: 'local', dashboardPort: 0 }))
+app.use(apiforge({ dashboardPort: 0 }))
 ```
 
 ```python [Python]
-app.add_middleware(ApiForgeMiddleware, mode="local", dashboard_port=0)
+app.add_middleware(ApiForgeMiddleware, dashboard_port=0)
 ```
 
 :::
@@ -72,7 +76,7 @@ app.use(apiforge({ mode: 'local', dashboardPort: 9090 }))
 ```
 
 ```python [Python]
-app.add_middleware(ApiForgeMiddleware, mode="local", dashboard_port=9090)
+app.add_middleware(ApiForgeMiddleware, dashboard_port=9090)
 # Dashboard → http://localhost:9090
 ```
 

@@ -21,7 +21,7 @@ export default defineConfig({
       { text: 'Features', link: '/features/insights' },
       { text: 'API Reference', link: '/guide/configuration' },
       {
-        text: 'v1.0.3',
+        text: 'v2.0.0',
         items: [
           { text: 'Changelog (Node.js)', link: 'https://github.com/APIForge-Organisation/sdk-nodejs/blob/main/CHANGELOG.md' },
           { text: 'Changelog (Python)', link: 'https://github.com/APIForge-Organisation/sdk-python/blob/main/CHANGELOG.md' },
@@ -42,9 +42,10 @@ export default defineConfig({
           ],
         },
         {
-          text: 'Dashboard',
+          text: 'Deployment',
           items: [
             { text: 'Local Dashboard', link: '/guide/dashboard' },
+            { text: 'Cloud Mode', link: '/guide/cloud-mode' },
           ],
         },
       ],

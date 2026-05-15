@@ -2,16 +2,28 @@
 
 ## Node.js
 
-All options are passed to the `apiforge()` factory. Every option is optional except `mode`.
+All options are passed to the `apiforge()` factory. All options are optional — calling `apiforge()` with no arguments starts local mode with defaults.
 
 ```js
+// Local mode (default)
 app.use(apiforge({
-  mode:          'local',
   dbPath:        '.apiforge.db',
   dashboardPort: 4242,
   flushInterval: 60_000,
   env:           'production',
-  release:       'v1.4.0',
+  release:       'v2.0.0',
+  service:       'user-service',
+  sampling:      1.0,
+  ignorePaths:   ['/favicon.ico', '/health'],
+}))
+
+// Cloud mode
+app.use(apiforge({
+  cloudUrl:      'https://api.apiforge.fr',
+  apiKey:        process.env.APIFORGE_API_KEY,
+  flushInterval: 60_000,
+  env:           'production',
+  release:       'v2.0.0',
   service:       'user-service',
   sampling:      1.0,
   ignorePaths:   ['/favicon.ico', '/health'],
@@ -20,20 +32,31 @@ app.use(apiforge({
 
 ## Python
 
-All options are passed to `ApiForgeMiddleware`. Every option is optional except `mode`.
+All options are passed to `ApiForgeMiddleware`. All options are optional.
 
 ```python
+# Local mode (default)
 app.add_middleware(
     ApiForgeMiddleware,
-    mode="local",
     db_path=".apiforge.db",
     dashboard_port=4242,
     flush_interval=60_000,   # ms
     env="production",
-    release="v1.4.0",
+    release="v2.0.0",
     service="user-service",
     sampling=1.0,
     ignore_paths=["/favicon.ico", "/health"],
+)
+
+# Cloud mode
+app.add_middleware(
+    ApiForgeMiddleware,
+    cloud_url="https://api.apiforge.fr",
+    api_key=os.environ["APIFORGE_API_KEY"],
+    flush_interval=60_000,
+    env="production",
+    release="v2.0.0",
+    service="user-service",
 )
 ```
 
@@ -45,12 +68,25 @@ Python uses `snake_case` for option names. All other semantics — including uni
 
 ## Options
 
-### `mode` / `mode`
+### `cloudUrl` / `cloud_url`
 
-- **Type:** `'local'`
-- **Required:** yes
+- **Type:** `string | null`
+- **Default:** `null`
 
-The storage and transport mode. Only `'local'` (SQLite) is available. SaaS mode is planned for a future version.
+Base URL of the APIForge SaaS API. Required for cloud mode, along with `apiKey`. When set, local SQLite storage and the embedded dashboard are disabled.
+
+---
+
+### `apiKey` / `api_key`
+
+- **Type:** `string | null`
+- **Default:** `null`
+
+Project API key, starting with `af_`. Generated from the APIForge dashboard when you create a project. Must be provided together with `cloudUrl`.
+
+::: warning Keep your API key secret
+Never commit your API key to source control. Use an environment variable: `process.env.APIFORGE_API_KEY` (Node.js) or `os.environ["APIFORGE_API_KEY"]` (Python).
+:::
 
 ---
 
@@ -59,7 +95,7 @@ The storage and transport mode. Only `'local'` (SQLite) is available. SaaS mode 
 - **Type:** `string`
 - **Default:** `'.apiforge.db'`
 
-Path to the SQLite database file. Created automatically if it does not exist.
+Path to the SQLite database file (local mode only). Created automatically if it does not exist.
 
 ---
 
@@ -68,18 +104,18 @@ Path to the SQLite database file. Created automatically if it does not exist.
 - **Type:** `number` / `int`
 - **Default:** `4242`
 
-Port for the local dashboard HTTP server. Set to `0` to disable the dashboard entirely.
+Port for the local dashboard HTTP server (local mode only). Set to `0` to disable the dashboard entirely.
 
 ```js
 // Node.js
-apiforge({ mode: 'local', dashboardPort: 0 })    // no dashboard
-apiforge({ mode: 'local', dashboardPort: 9000 })  // custom port
+apiforge({ dashboardPort: 0 })    // no dashboard
+apiforge({ dashboardPort: 9000 }) // custom port
 ```
 
 ```python
 # Python
-ApiForgeMiddleware(mode="local", dashboard_port=0)     # no dashboard
-ApiForgeMiddleware(mode="local", dashboard_port=9000)  # custom port
+ApiForgeMiddleware(dashboard_port=0)     # no dashboard
+ApiForgeMiddleware(dashboard_port=9000)  # custom port
 ```
 
 ---
@@ -88,7 +124,7 @@ ApiForgeMiddleware(mode="local", dashboard_port=9000)  # custom port
 
 - **Type:** `number` / `int` (milliseconds) — Default: `60000`
 
-How often the in-memory buffer is flushed to SQLite. Both SDKs use **milliseconds**.
+How often the in-memory buffer is flushed (to SQLite in local mode, to the SaaS API in cloud mode).
 
 ::: warning Minimum recommended value
 Values below 5 seconds may impact performance under high traffic. The default of 60s is appropriate for most applications.
@@ -100,9 +136,9 @@ Values below 5 seconds may impact performance under high traffic. The default of
 
 - **Type:** `string`
 - **Default (Node.js):** `process.env.NODE_ENV ?? 'production'`
-- **Default (Python):** `'production'`
+- **Default (Python):** `os.environ.get("ENV", "production")`
 
-Environment label stored with each metric.
+Environment label stored with each metric (e.g. `'production'`, `'staging'`).
 
 ---
 
@@ -115,13 +151,12 @@ Version tag for the current deployment. When provided, APIForge creates a compar
 
 ```js
 // Node.js
-apiforge({ mode: 'local', release: process.env.npm_package_version })
+apiforge({ release: process.env.npm_package_version })
 ```
 
 ```python
 # Python
-import os
-ApiForgeMiddleware(mode="local", release=os.environ.get("RELEASE"))
+ApiForgeMiddleware(release=os.environ.get("RELEASE"))
 ```
 
 See [Release Tracking](/features/release-tracking) for details.
@@ -133,7 +168,7 @@ See [Release Tracking](/features/release-tracking) for details.
 - **Type:** `string`
 - **Default:** `'default'`
 
-Service name, used to distinguish multiple APIs sharing the same database.
+Service name. In local mode, used to distinguish multiple APIs sharing the same database. In cloud mode, used to group routes in the dashboard.
 
 ---
 
@@ -160,7 +195,7 @@ Paths to exclude from instrumentation. Supports exact matches.
 ### Node.js
 
 ```js
-const mw = apiforge({ mode: 'local' })
+const mw = apiforge()
 app.use(mw)
 
 process.on('SIGTERM', () => {
@@ -174,8 +209,7 @@ process.on('SIGTERM', () => {
 ```python
 import atexit
 
-mw = ApiForgeMiddleware(mode="local")
-app.add_middleware(mw)
+mw = ApiForgeMiddleware(app)
 
 atexit.register(mw.shutdown)
 ```

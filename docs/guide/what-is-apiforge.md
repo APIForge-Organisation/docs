@@ -25,15 +25,19 @@ What is captured: route pattern, HTTP method, status code, latency, response siz
 
 What is never captured: request body, response body, headers, cookies, tokens, IP addresses, query parameter values, any user-identifying data.
 
-### Local-first
+### Local-first by default
 
-APIForge works completely offline. No account required, no cloud configuration, no database to set up. All data is stored in a single SQLite file on your server.
+APIForge works completely offline out of the box. No account required, no cloud configuration, no database to set up. All data is stored in a single SQLite file on your server.
 
 The dashboard, the insights engine, the Health Score — everything runs in the same process as your application.
 
+### Cloud mode — optional
+
+For production environments or multi-service setups, cloud mode sends metrics to the APIForge SaaS. Add `cloudUrl` and `apiKey` to your middleware config — nothing else changes.
+
 ### Developer-first
 
-Installation time under 5 minutes. One mandatory parameter (`mode: 'local'`). The dashboard auto-starts. Insights surface automatically.
+Installation time under 5 minutes. No mandatory parameters. The dashboard auto-starts on port 4242. Insights surface automatically.
 
 ## What APIForge is not
 
