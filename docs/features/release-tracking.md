@@ -6,21 +6,39 @@ Release tracking automatically compares your API's performance before and after 
 
 Pass the current version as the `release` option:
 
-```js
+::: code-group
+
+```js [Node.js]
 app.use(apiforge({
   mode: 'local',
   release: process.env.npm_package_version,
 }))
 ```
 
+```python [Python]
+import os
+app.add_middleware(
+    ApiForgeMiddleware,
+    mode="local",
+    release=os.environ.get("RELEASE"),
+)
+```
+
+:::
+
 Or hardcode it during the deploy process:
 
-```js
-app.use(apiforge({
-  mode: 'local',
-  release: 'v1.4.0',
-}))
+::: code-group
+
+```js [Node.js]
+app.use(apiforge({ mode: 'local', release: 'v1.4.0' }))
 ```
+
+```python [Python]
+app.add_middleware(ApiForgeMiddleware, mode="local", release="v1.4.0")
+```
+
+:::
 
 ::: tip Automate with environment variables
 Most CI/CD systems expose the version or git tag as an environment variable. Inject it at build time so it changes automatically on every deploy.

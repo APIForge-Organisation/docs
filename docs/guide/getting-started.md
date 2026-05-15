@@ -1,19 +1,21 @@
 # Quick Start
 
-Get APIForge running in your Express.js application in under 5 minutes.
+Get APIForge running in your application in under 5 minutes.
 
-## Requirements
+## Node.js — Express.js
+
+### Requirements
 
 - Node.js **22.5 or higher** (uses the built-in `node:sqlite` module)
 - An Express.js application (v4 or v5)
 
-## Installation
+### Installation
 
 ```bash
 npm install apiforgejs
 ```
 
-## Add the middleware
+### Add the middleware
 
 ```js
 const express = require('express')
@@ -21,7 +23,6 @@ const { apiforge } = require('apiforgejs')
 
 const app = express()
 
-// Add this line — that's it
 app.use(apiforge({ mode: 'local' }))
 
 app.get('/users/:id', (req, res) => {
@@ -30,6 +31,44 @@ app.get('/users/:id', (req, res) => {
 
 app.listen(3000)
 ```
+
+### ESM projects
+
+```js
+import { apiforge } from 'apiforgejs'
+```
+
+---
+
+## Python — FastAPI / Starlette
+
+### Requirements
+
+- Python **3.11 or higher**
+- A FastAPI or Starlette application
+
+### Installation
+
+```bash
+pip install apiforgepy
+```
+
+### Add the middleware
+
+```python
+from fastapi import FastAPI
+from apiforgepy import ApiForgeMiddleware
+
+app = FastAPI()
+
+app.add_middleware(ApiForgeMiddleware, mode="local")
+
+@app.get("/users/{user_id}")
+def get_user(user_id: int):
+    return {"id": user_id}
+```
+
+---
 
 ## Open the dashboard
 
@@ -49,24 +88,6 @@ You'll see:
 ::: tip First metrics
 The dashboard aggregates data every 60 seconds by default. Send a few requests to your API, wait one minute, and refresh — your first metrics will appear.
 :::
-
-## ESM projects
-
-```js
-import { apiforge } from 'apiforgejs'
-```
-
-## Verify it works
-
-```bash
-# Send a few test requests
-curl http://localhost:3000/users/1
-curl http://localhost:3000/users/2
-curl http://localhost:3000/users/404-test
-
-# Check the dashboard
-open http://localhost:4242
-```
 
 ## What's next
 

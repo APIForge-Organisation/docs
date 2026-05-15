@@ -22,7 +22,7 @@ Identifies endpoints that have received no traffic for an extended period — sa
 
 > *"`DELETE /legacy/import` has received no requests in 23 days. Consider deprecating this endpoint."*
 
-**Triggers when:** An endpoint has zero requests for the past **21 days** (configurable via `deadThresholdDays`).
+**Triggers when:** An endpoint has zero requests for the past **21 days**.
 
 ---
 
@@ -53,11 +53,24 @@ Insights are sorted by severity in the dashboard:
 
 Set the `release` option to activate `PERF` and `OK` insights:
 
-```js
+::: code-group
+
+```js [Node.js]
 app.use(apiforge({
   mode: 'local',
-  release: process.env.npm_package_version, // e.g. '1.4.0'
+  release: process.env.npm_package_version,
 }))
 ```
+
+```python [Python]
+import os
+app.add_middleware(
+    ApiForgeMiddleware,
+    mode="local",
+    release=os.environ.get("RELEASE"),
+)
+```
+
+:::
 
 Each time the value changes (i.e. on a new deploy), APIForge creates a comparison baseline automatically.

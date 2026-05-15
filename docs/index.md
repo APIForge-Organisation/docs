@@ -11,7 +11,7 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: View on GitHub
-      link: https://github.com/APIForge-Organisation/sdk-nodejs
+      link: https://github.com/APIForge-Organisation
 
 features:
   - icon: 🔒
@@ -20,7 +20,7 @@ features:
 
   - icon: 💾
     title: Local-first by default
-    details: Works completely offline. No account, no cloud configuration, no credit card. Just npm install and one line of code. Your data stays in a SQLite file on your server.
+    details: Works completely offline. No account, no cloud configuration, no credit card. Just install and one line of code. Your data stays in a SQLite file on your server.
 
   - icon: ⚡
     title: Up and running in 5 minutes
@@ -29,4 +29,12 @@ features:
   - icon: 🧠
     title: Automatic insights
     details: Plain-language alerts generated from your traffic — no dashboards to configure. Anomaly detection, dead endpoint identification, before/after release comparison.
+
+  - icon: 🟢
+    title: Node.js SDK — apiforgejs
+    details: Drop-in Express.js middleware. Requires Node.js ≥ 22.5. Install via npm.
+
+  - icon: 🐍
+    title: Python SDK — apiforgepy
+    details: Drop-in FastAPI / Starlette middleware. Requires Python ≥ 3.11. Install via pip.
 ---

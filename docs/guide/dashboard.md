@@ -1,6 +1,6 @@
 # Local Dashboard
 
-The local dashboard is a built-in web UI served automatically by the SDK on port 4242 (configurable).
+The local dashboard is a built-in web UI served automatically by the SDK on port 4242 (configurable). It is identical across all SDKs — the same interface whether you run Node.js or Python.
 
 ```
 http://localhost:4242
@@ -35,7 +35,7 @@ All instrumented routes, sorted by request volume. Columns:
 
 | Column | Description |
 |---|---|
-| Route | Parameterized pattern — e.g. `GET /users/:id` |
+| Route | Parameterized pattern — e.g. `GET /users/:id` or `GET /users/{user_id}` |
 | Requests | Total calls in the selected time range |
 | P50 / P90 / P99 | Latency percentiles in milliseconds |
 | Error rate | Percentage of 4xx + 5xx responses |
@@ -47,20 +47,33 @@ Automatically generated alerts — no configuration required. See [Automatic Ins
 
 ## Disabling the dashboard
 
-Set `dashboardPort: 0` in your config:
+::: code-group
 
-```js
+```js [Node.js]
 app.use(apiforge({ mode: 'local', dashboardPort: 0 }))
 ```
 
-This is useful in production environments where you don't want to expose an extra port, or in test environments.
+```python [Python]
+app.add_middleware(ApiForgeMiddleware, mode="local", dashboard_port=0)
+```
+
+:::
 
 ## Custom port
 
-```js
+::: code-group
+
+```js [Node.js]
 app.use(apiforge({ mode: 'local', dashboardPort: 9090 }))
 // Dashboard → http://localhost:9090
 ```
+
+```python [Python]
+app.add_middleware(ApiForgeMiddleware, mode="local", dashboard_port=9090)
+# Dashboard → http://localhost:9090
+```
+
+:::
 
 ## Security note
 
