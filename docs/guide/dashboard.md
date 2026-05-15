@@ -38,12 +38,15 @@ All instrumented routes, sorted by request volume. Columns:
 | Route | Parameterized pattern — e.g. `GET /users/:id` or `GET /users/{user_id}` |
 | Requests | Total calls in the selected time range |
 | P50 / P90 / P99 | Latency percentiles in milliseconds |
+| Avg size | Average response body size in bytes (`Content-Length`), when available |
 | Error rate | Percentage of 4xx + 5xx responses |
 | Status | `OK`, `SLOW`, `DEGRADED`, or `DEAD` |
 
 ### Insights panel
 
-Automatically generated alerts — no configuration required. See [Automatic Insights](/features/insights).
+Automatically generated alerts — no configuration required. Filter chips let you narrow the list to a specific insight type: **ANOMALY**, **DRIFT**, **DEAD**, **PERF**, or **UNTRACKED**.
+
+See [Automatic Insights](/features/insights).
 
 ## Disabling the dashboard
 

@@ -28,7 +28,7 @@ app.add_middleware(
     mode="local",
     db_path=".apiforge.db",
     dashboard_port=4242,
-    flush_interval=60,
+    flush_interval=60_000,   # ms
     env="production",
     release="v1.4.0",
     service="user-service",
@@ -38,7 +38,7 @@ app.add_middleware(
 ```
 
 ::: tip Python naming
-Python uses `snake_case` for option names. `flush_interval` is in **seconds** (not milliseconds).
+Python uses `snake_case` for option names. All other semantics — including units — are identical to the Node.js SDK.
 :::
 
 ---
@@ -86,10 +86,9 @@ ApiForgeMiddleware(mode="local", dashboard_port=9000)  # custom port
 
 ### `flushInterval` / `flush_interval`
 
-- **Type (Node.js):** `number` (milliseconds) — Default: `60000`
-- **Type (Python):** `int` (seconds) — Default: `60`
+- **Type:** `number` / `int` (milliseconds) — Default: `60000`
 
-How often the in-memory buffer is flushed to SQLite.
+How often the in-memory buffer is flushed to SQLite. Both SDKs use **milliseconds**.
 
 ::: warning Minimum recommended value
 Values below 5 seconds may impact performance under high traffic. The default of 60s is appropriate for most applications.

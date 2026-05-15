@@ -21,7 +21,7 @@ Most observability tools show you *what is happening* — a latency spike, an er
 
 Not a policy — an architecture constraint. The SDK is built so it is **technically impossible** to collect sensitive data, even if you wanted to.
 
-What is captured: route pattern, HTTP method, status code, latency, timestamp.
+What is captured: route pattern, HTTP method, status code, latency, response size (bytes), timestamp.
 
 What is never captured: request body, response body, headers, cookies, tokens, IP addresses, query parameter values, any user-identifying data.
 

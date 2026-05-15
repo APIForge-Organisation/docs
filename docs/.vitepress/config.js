@@ -21,7 +21,7 @@ export default defineConfig({
       { text: 'Features', link: '/features/insights' },
       { text: 'API Reference', link: '/guide/configuration' },
       {
-        text: 'v1.0.0',
+        text: 'v1.0.3',
         items: [
           { text: 'Changelog (Node.js)', link: 'https://github.com/APIForge-Organisation/sdk-nodejs/blob/main/CHANGELOG.md' },
           { text: 'Changelog (Python)', link: 'https://github.com/APIForge-Organisation/sdk-python/blob/main/CHANGELOG.md' },
