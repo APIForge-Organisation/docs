@@ -79,7 +79,7 @@ APIFORGE_API_KEY=af_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ## How it works
 
 1. The SDK intercepts each request and records route, method, status code, and latency.
-2. Every `flushInterval` (default: 60 s), the buffer is aggregated into per-route statistics and sent to `POST /ingest` on the SaaS API.
+2. Every **60 seconds**, the buffer is aggregated into per-route statistics and sent to `POST /ingest` on the SaaS API.
 3. The SaaS stores the metrics in TimescaleDB and makes them available through the cloud dashboard.
 
 ::: info PHP buffering

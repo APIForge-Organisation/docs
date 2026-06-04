@@ -9,17 +9,11 @@ Pass the current version as the `release` option:
 ::: code-group
 
 ```js [Node.js]
-app.use(apiforge({
-  release: process.env.npm_package_version,
-}))
+app.use(apiforge({ release: 'v1.4.0' }))
 ```
 
 ```python [Python]
-import os
-app.add_middleware(
-    ApiForgeMiddleware,
-    release=os.environ.get("RELEASE"),
-)
+app.add_middleware(ApiForgeMiddleware, release="v1.4.0")
 ```
 
 ```bash [PHP / Laravel (.env)]

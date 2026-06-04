@@ -9,7 +9,6 @@ All options are passed to the `apiforge()` factory. All options are optional —
 app.use(apiforge({
   dbPath:        '.apiforge.db',
   dashboardPort: 4242,
-  flushInterval: 60_000,
   env:           'production',
   release:       'v2.0.0',
   service:       'user-service',
@@ -19,14 +18,13 @@ app.use(apiforge({
 
 // Cloud mode
 app.use(apiforge({
-  cloudUrl:      'https://api.apiforge.fr',
-  apiKey:        process.env.APIFORGE_API_KEY,
-  flushInterval: 60_000,
-  env:           'production',
-  release:       'v2.0.0',
-  service:       'user-service',
-  sampling:      1.0,
-  ignorePaths:   ['/favicon.ico', '/health'],
+  cloudUrl:    'https://api.apiforge.fr',
+  apiKey:      'af_your_key',
+  env:         'production',
+  release:     'v2.0.0',
+  service:     'user-service',
+  sampling:    1.0,
+  ignorePaths: ['/favicon.ico', '/health'],
 }))
 ```
 
@@ -40,7 +38,6 @@ app.add_middleware(
     ApiForgeMiddleware,
     db_path=".apiforge.db",
     dashboard_port=4242,
-    flush_interval=60_000,   # ms
     env="production",
     release="v2.0.0",
     service="user-service",
@@ -52,8 +49,7 @@ app.add_middleware(
 app.add_middleware(
     ApiForgeMiddleware,
     cloud_url="https://api.apiforge.fr",
-    api_key=os.environ["APIFORGE_API_KEY"],
-    flush_interval=60_000,
+    api_key="af_your_key",
     env="production",
     release="v2.0.0",
     service="user-service",
@@ -66,34 +62,36 @@ Python uses `snake_case` for option names. All other semantics are identical to 
 
 ## PHP (Laravel)
 
-Configure via environment variables or by publishing the config file:
+Publish the config file and set values explicitly — the SDK does not read environment variables:
 
 ```bash
 php artisan vendor:publish --tag=apiforge-config
 ```
 
-| Variable | Default | Description |
-|---|---|---|
-| `APIFORGE_CLOUD_URL` | — | Cloud mode: SaaS API base URL |
-| `APIFORGE_API_KEY` | — | Cloud mode: project API key (`af_…`) |
-| `APIFORGE_ENV` | `APP_ENV` | Environment label |
-| `APIFORGE_RELEASE` | `APP_VERSION` | Release/version tag |
-| `APIFORGE_SERVICE` | `APP_NAME` | Service name |
-| `APIFORGE_SAMPLING` | `1.0` | Sample rate 0.0–1.0 |
-| `APIFORGE_FLUSH_INTERVAL` | `60` | Cloud mode: seconds between ingest flushes |
-| `APIFORGE_DASHBOARD` | `true` | Enable/disable the local dashboard routes |
-| `APIFORGE_DASHBOARD_PREFIX` | `_apiforge` | URL prefix for the local dashboard |
+```php
+// config/apiforge.php
+return [
+    'cloud_url' => null,               // set to 'https://api.apiforge.fr' for cloud mode
+    'api_key'   => null,               // set to 'af_...' for cloud mode
+    'env'       => 'production',
+    'release'   => 'v2.0.0',
+    'service'   => 'user-service',
+    'sampling'  => 1.0,
+    'dashboard_enabled' => true,
+    'dashboard_prefix'  => '_apiforge',
+    'ignore_paths' => ['/favicon.ico'],
+];
+```
 
-::: tip PHP-specific differences
-- `APIFORGE_FLUSH_INTERVAL` is in **seconds** (not milliseconds like Node.js/Python)
-- The local dashboard is served at `/_apiforge` via Laravel routing, not on a separate port
+::: tip PHP dashboard
+The local dashboard is served at `/_apiforge` via Laravel routing, not on a separate port.
 :::
 
 ---
 
 ## Options reference
 
-### `cloudUrl` / `cloud_url` / `APIFORGE_CLOUD_URL`
+### `cloudUrl` / `cloud_url` / `cloud_url` (PHP config key)
 
 - **Type:** `string | null` — **Default:** `null`
 
@@ -101,14 +99,14 @@ Base URL of the APIForge SaaS API. Required for cloud mode, along with `apiKey`.
 
 ---
 
-### `apiKey` / `api_key` / `APIFORGE_API_KEY`
+### `apiKey` / `api_key` / `api_key` (PHP config key)
 
 - **Type:** `string | null` — **Default:** `null`
 
 Project API key, starting with `af_`. Must be provided together with `cloudUrl`.
 
 ::: warning Keep your API key secret
-Never commit your API key to source control. Use an environment variable.
+Never commit your API key to source control. Use your secrets manager or a `.env` file excluded from git.
 :::
 
 ---
@@ -124,7 +122,7 @@ Path to the SQLite database file (local mode only). Created automatically if it 
 ### `dashboardPort` / `dashboard_port`
 
 - **Type:** `number / int` — **Default:** `4242`
-- **PHP equivalent:** `APIFORGE_DASHBOARD` + `APIFORGE_DASHBOARD_PREFIX`
+- **PHP equivalent:** `dashboard_enabled` + `dashboard_prefix` config keys
 
 Port for the local dashboard HTTP server. Set to `0` to disable.
 
@@ -140,61 +138,48 @@ ApiForgeMiddleware(dashboard_port=0)     # disabled
 ApiForgeMiddleware(dashboard_port=9000)  # custom port
 ```
 
-```bash
-# PHP — disable or change prefix
-APIFORGE_DASHBOARD=false
-APIFORGE_DASHBOARD_PREFIX=my-debug
+```php
+// PHP — config/apiforge.php
+'dashboard_enabled' => false,           // disabled
+'dashboard_prefix'  => 'debug/api',     // custom prefix
 ```
 
 ---
 
-### `flushInterval` / `flush_interval` / `APIFORGE_FLUSH_INTERVAL`
+### `env`
 
-- **Node.js / Python:** milliseconds — **Default:** `60000`
-- **PHP:** seconds — **Default:** `60`
+- **Type:** `string` — **Default:** `'production'`
 
-How often the buffer is flushed (to SQLite in local mode, to the SaaS API in cloud mode).
-
-::: warning Minimum recommended value
-Values below 5 seconds may impact performance under high traffic.
-:::
+Environment label stored with each metric (e.g. `'production'`, `'staging'`). Set explicitly — no environment variable is read automatically.
 
 ---
 
-### `env` / `APIFORGE_ENV`
-
-- **Default (Node.js):** `process.env.NODE_ENV ?? 'production'`
-- **Default (Python):** `os.environ.get("ENV", "production")`
-- **Default (PHP):** `APP_ENV`
-
-Environment label stored with each metric (e.g. `'production'`, `'staging'`).
-
----
-
-### `release` / `APIFORGE_RELEASE`
+### `release`
 
 - **Type:** `string | null` — **Default:** `null`
 
 Version tag for the current deployment. When provided, APIForge creates a before/after comparison on every deploy.
 
 ```js
-apiforge({ release: process.env.npm_package_version })
+// Node.js — set from your build system
+apiforge({ release: 'v1.4.0' })
 ```
 
 ```python
-ApiForgeMiddleware(release=os.environ.get("RELEASE"))
+# Python
+ApiForgeMiddleware(release="v1.4.0")
 ```
 
-```bash
-# PHP
-APIFORGE_RELEASE=v1.4.0
+```php
+// PHP — config/apiforge.php
+'release' => 'v1.4.0',
 ```
 
 See [Release Tracking](/features/release-tracking).
 
 ---
 
-### `service` / `APIFORGE_SERVICE`
+### `service`
 
 - **Type:** `string` — **Default:** `'default'`
 
@@ -202,7 +187,7 @@ Service name. Used to group routes in the dashboard across multiple API processe
 
 ---
 
-### `sampling` / `APIFORGE_SAMPLING`
+### `sampling`
 
 - **Type:** `number / float` (0.0 – 1.0) — **Default:** `1.0`
 
@@ -210,11 +195,17 @@ Fraction of requests to instrument. Reduce under very high traffic to lower over
 
 ---
 
-### `ignorePaths` / `ignore_paths` / `APIFORGE_IGNORE_PATHS`
+### `ignorePaths` / `ignore_paths`
 
 - **Type:** `string[]` — **Default:** `['/favicon.ico']`
 
 Paths excluded from instrumentation. Exact matches only.
+
+---
+
+## Flush interval
+
+Metrics are aggregated in memory (Node.js, Python) or in a local temp file (PHP) and flushed every **60 seconds**. This value is fixed and not configurable — it ensures a consistent, predictable load on the ingest API.
 
 ---
 
@@ -235,11 +226,6 @@ process.on('SIGTERM', () => {
 ### Python
 
 Cleanup is registered automatically via `atexit` — no action needed for standard deployments.
-
-```python
-import atexit
-# Already called internally: atexit.register(middleware._cleanup)
-```
 
 ### PHP
 
