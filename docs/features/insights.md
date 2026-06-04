@@ -46,9 +46,9 @@ Identifies endpoints that have received no traffic for an extended period — sa
 
 Compares performance metrics before and after a deployment, when a `release` tag is configured.
 
-> **PERF** — *"`POST /orders` P99 latency increased by 40% after deploying v1.3.0 (14h32 yesterday). Before: 230ms — After: 322ms."*
+> **PERF** — *"`POST /orders` P99 latency increased by 40% after deploying v1.3.0. Before: 230ms — After: 322ms."*
 
-> **OK** — *"Deploy v1.4.0 (3 hours ago) introduced no detectable regression. Latency stable, error rate unchanged."*
+> **OK** — *"Deploy v1.4.0 improved `GET /products` by 12%. Before: 85ms — After: 75ms."*
 
 **Triggers when:** A `release` value is set in the config and at least 30 minutes of post-deploy data is available.
 
@@ -62,10 +62,12 @@ Identifies routes declared in your router that have never received a single requ
 
 > *"`POST /admin/export` is declared in the router but has never received any traffic."*
 
-**Triggers when:** A route appears in the Express / FastAPI router but has zero entries in the metrics database.
+**Triggers when:** A route appears in the router registry but has zero entries in the metrics database.
 
-::: tip Node.js only
-UNTRACKED insights require that the SDK can inspect the Express router at startup. They are not generated for routes registered after the first request.
+::: tip Available on all SDKs
+- **Node.js** — scans the Express router automatically on the first request
+- **Python** — scans the Starlette/FastAPI router automatically on the first request
+- **PHP / Laravel** — syncs the Laravel route registry via the ServiceProvider on boot
 :::
 
 ---
@@ -89,7 +91,6 @@ Set the `release` option to activate `PERF` and `OK` insights:
 
 ```js [Node.js]
 app.use(apiforge({
-  mode: 'local',
   release: process.env.npm_package_version,
 }))
 ```
@@ -98,9 +99,12 @@ app.use(apiforge({
 import os
 app.add_middleware(
     ApiForgeMiddleware,
-    mode="local",
     release=os.environ.get("RELEASE"),
 )
+```
+
+```bash [PHP / Laravel (.env)]
+APIFORGE_RELEASE=v1.4.0
 ```
 
 :::

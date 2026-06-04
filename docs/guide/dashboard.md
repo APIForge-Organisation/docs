@@ -1,16 +1,28 @@
 # Local Dashboard
 
-The local dashboard is a built-in web UI served automatically by the SDK on port 4242 (configurable). It is identical across all SDKs — the same interface whether you run Node.js or Python.
+The local dashboard is a built-in web UI served automatically by the SDK. It shows the same interface across all SDKs.
 
 ::: info Cloud mode
 In cloud mode, the local dashboard is not started. Metrics are visualized in the APIForge cloud dashboard instead. See [Cloud Mode](/guide/cloud-mode).
 :::
 
-```
+## Access
+
+::: code-group
+
+```txt [Node.js / Python]
 http://localhost:4242
 ```
 
-No installation, no separate server, no configuration needed.
+```txt [PHP / Laravel]
+http://localhost:8000/_apiforge
+```
+
+:::
+
+**Node.js and Python** start a dedicated HTTP server on port 4242 automatically in the background when your app starts.
+
+**PHP / Laravel** serves the dashboard via routes registered at `/_apiforge` on your app's own port — no separate process is needed.
 
 ## Panels
 
@@ -64,14 +76,18 @@ app.use(apiforge({ dashboardPort: 0 }))
 app.add_middleware(ApiForgeMiddleware, dashboard_port=0)
 ```
 
+```bash [PHP / Laravel (.env)]
+APIFORGE_DASHBOARD=false
+```
+
 :::
 
-## Custom port
+## Custom port / prefix
 
 ::: code-group
 
 ```js [Node.js]
-app.use(apiforge({ mode: 'local', dashboardPort: 9090 }))
+app.use(apiforge({ dashboardPort: 9090 }))
 // Dashboard → http://localhost:9090
 ```
 
@@ -80,13 +96,21 @@ app.add_middleware(ApiForgeMiddleware, dashboard_port=9090)
 # Dashboard → http://localhost:9090
 ```
 
+```bash [PHP / Laravel (.env)]
+APIFORGE_DASHBOARD_PREFIX=debug/apiforge
+# Dashboard → http://localhost:8000/debug/apiforge
+```
+
 :::
 
 ## Security note
 
-The dashboard has no authentication in local mode. **Do not expose port 4242 to the public internet.** Use a firewall rule or SSH tunnel if you need to access it remotely:
+The dashboard has no authentication in local mode. **Do not expose port 4242 (or the `/_apiforge` prefix) to the public internet.** Use a firewall rule or SSH tunnel if you need to access it remotely:
 
 ```bash
+# Node.js / Python
 ssh -L 4242:localhost:4242 user@your-server
-# Then open http://localhost:4242 locally
+# Then open http://localhost:4242
+
+# PHP / Laravel — protect the route in production via middleware
 ```

@@ -8,7 +8,7 @@ Cloud mode sends your metrics to the APIForge SaaS instead of storing them local
 |---|---|---|
 | Setup | Zero config | Requires an API key |
 | Data storage | SQLite on your server | APIForge SaaS |
-| Dashboard | Embedded (port 4242) | Cloud dashboard |
+| Dashboard | Embedded (port 4242 / `/_apiforge`) | Cloud dashboard |
 | Multi-service | One DB per machine | Unified across all services |
 | Internet required | No | Yes |
 
@@ -55,6 +55,18 @@ app.add_middleware(
 )
 ```
 
+```php [PHP / Laravel]
+// .env
+// APIFORGE_CLOUD_URL=https://api.apiforge.fr
+// APIFORGE_API_KEY=af_...
+// APIFORGE_SERVICE=my-api
+
+// bootstrap/app.php — no code change vs local mode
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->append(\ApiForge\Laravel\ApiForgeMiddleware::class);
+})
+```
+
 :::
 
 ### 3. Set environment variables
@@ -66,9 +78,13 @@ APIFORGE_API_KEY=af_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ## How it works
 
-1. The SDK intercepts each request and records route, method, status code, and latency in memory.
-2. Every `flushInterval` milliseconds (default: 60s), the buffer is aggregated into per-route statistics and sent to `POST /ingest` on the SaaS API.
+1. The SDK intercepts each request and records route, method, status code, and latency.
+2. Every `flushInterval` (default: 60 s), the buffer is aggregated into per-route statistics and sent to `POST /ingest` on the SaaS API.
 3. The SaaS stores the metrics in TimescaleDB and makes them available through the cloud dashboard.
+
+::: info PHP buffering
+PHP does not have a long-running process, so the SDK uses a file-based buffer (`/tmp/apiforgephp_*.jsonl`). Events accumulate per request and are flushed on the first request after `APIFORGE_FLUSH_INTERVAL` seconds.
+:::
 
 ## Circuit breaker
 
@@ -78,11 +94,13 @@ If the SaaS API is unreachable, the SDK automatically backs off:
 - During the pause, flush calls are silently skipped — your application is never blocked.
 - After the pause, the SDK resumes sending normally.
 
-A warning is printed to stdout when the circuit opens:
+A warning is logged when the circuit opens:
 
 ```
-[apiforgejs] Cloud flush failures — pausing for 60s. Error: ...
-[apiforgepy] Cloud flush failures — pausing for 60s. Error: ...
+[apiforgejs]  Cloud flush failures — pausing for 60s. Error: ...
+[apiforgepy]  Cloud flush failures — pausing for 60s. Error: ...
+[apiforgephp] Cloud flush error: HTTP 503 — ...
+[apiforgephp] Circuit open — pausing for 60s.
 ```
 
 ## Rotating an API key

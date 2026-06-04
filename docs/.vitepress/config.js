@@ -21,12 +21,14 @@ export default defineConfig({
       { text: 'Features', link: '/features/insights' },
       { text: 'API Reference', link: '/guide/configuration' },
       {
-        text: 'v2.0.0',
+        text: 'SDKs',
         items: [
           { text: 'Changelog (Node.js)', link: 'https://github.com/APIForge-Organisation/sdk-nodejs/blob/main/CHANGELOG.md' },
           { text: 'Changelog (Python)', link: 'https://github.com/APIForge-Organisation/sdk-python/blob/main/CHANGELOG.md' },
+          { text: 'Changelog (PHP)', link: 'https://github.com/APIForge-Organisation/sdk-composer/blob/main/CHANGELOG.md' },
           { text: 'npm — apiforgejs', link: 'https://www.npmjs.com/package/apiforgejs' },
           { text: 'PyPI — apiforgepy', link: 'https://pypi.org/project/apiforgepy/' },
+          { text: 'Packagist — apiforgephp', link: 'https://packagist.org/packages/apiforge/apiforgephp' },
         ],
       },
     ],

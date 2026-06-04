@@ -32,6 +32,7 @@ app.get('/users/:id', (req, res) => {
 })
 
 app.listen(3000)
+// Dashboard → http://localhost:4242
 ```
 
 ```js [Cloud mode]
@@ -87,6 +88,8 @@ app.add_middleware(ApiForgeMiddleware)
 @app.get("/users/{user_id}")
 def get_user(user_id: int):
     return {"id": user_id}
+
+# Dashboard → http://localhost:4242
 ```
 
 ```python [Cloud mode]
@@ -108,13 +111,79 @@ app.add_middleware(
 
 ---
 
+## PHP — Laravel
+
+### Requirements
+
+- PHP **8.2 or higher**
+- Laravel **10 or higher**
+- `pdo_sqlite` extension (`apt install php8.x-sqlite3` on Debian/Ubuntu)
+
+### Installation
+
+```bash
+composer require apiforge/apiforgephp
+```
+
+### Add the middleware
+
+The service provider is auto-discovered. Register the middleware in `bootstrap/app.php` (Laravel 11+) or `app/Http/Kernel.php` (Laravel 10):
+
+::: code-group
+
+```php [Local mode — Laravel 11+]
+// bootstrap/app.php
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->append(\ApiForge\Laravel\ApiForgeMiddleware::class);
+})
+
+// Dashboard → http://localhost:8000/_apiforge
+```
+
+```php [Local mode — Laravel 10]
+// app/Http/Kernel.php
+protected $middleware = [
+    // ...
+    \ApiForge\Laravel\ApiForgeMiddleware::class,
+];
+
+// Dashboard → http://localhost:8000/_apiforge
+```
+
+```php [Cloud mode]
+// .env
+// APIFORGE_CLOUD_URL=https://api.apiforge.fr
+// APIFORGE_API_KEY=af_...
+
+// bootstrap/app.php — same registration, mode is detected from env vars
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->append(\ApiForge\Laravel\ApiForgeMiddleware::class);
+})
+```
+
+:::
+
+::: tip PHP dashboard location
+In PHP/Laravel, the local dashboard is served at `/_apiforge` on your app's port — no separate HTTP server is started.
+:::
+
+---
+
 ## Open the local dashboard
 
 Once your server receives its first requests, open:
 
-```
+::: code-group
+
+```txt [Node.js / Python]
 http://localhost:4242
 ```
+
+```txt [PHP / Laravel]
+http://localhost:8000/_apiforge
+```
+
+:::
 
 You'll see:
 

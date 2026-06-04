@@ -10,7 +10,6 @@ Pass the current version as the `release` option:
 
 ```js [Node.js]
 app.use(apiforge({
-  mode: 'local',
   release: process.env.npm_package_version,
 }))
 ```
@@ -19,9 +18,13 @@ app.use(apiforge({
 import os
 app.add_middleware(
     ApiForgeMiddleware,
-    mode="local",
     release=os.environ.get("RELEASE"),
 )
+```
+
+```bash [PHP / Laravel (.env)]
+APIFORGE_RELEASE=v1.4.0
+# or use APP_VERSION which is read by default
 ```
 
 :::
@@ -31,11 +34,16 @@ Or hardcode it during the deploy process:
 ::: code-group
 
 ```js [Node.js]
-app.use(apiforge({ mode: 'local', release: 'v1.4.0' }))
+app.use(apiforge({ release: 'v1.4.0' }))
 ```
 
 ```python [Python]
-app.add_middleware(ApiForgeMiddleware, mode="local", release="v1.4.0")
+app.add_middleware(ApiForgeMiddleware, release="v1.4.0")
+```
+
+```php [PHP / Laravel]
+// config/apiforge.php
+'release' => env('APIFORGE_RELEASE', config('app.version')),
 ```
 
 :::
@@ -54,9 +62,7 @@ Most CI/CD systems expose the version or git tag as an environment variable. Inj
 
 | Metric | Compared |
 |---|---|
-| P50 latency | Before vs after |
 | P90 latency | Before vs after |
-| P99 latency | Before vs after |
 | Error rate (4xx + 5xx) | Before vs after |
 
 ## Example insights generated
@@ -65,7 +71,7 @@ Most CI/CD systems expose the version or git tag as an environment variable. Inj
 ✅ OK   v1.4.0 (deployed 3h ago) — No regression detected.
          Latency stable across 12 endpoints. Error rate unchanged.
 
-⚠️ PERF  POST /checkout — P99 +38% after v1.4.0
+⚠️ PERF  POST /checkout — P90 +38% after v1.4.0
          Before: 210ms · After: 290ms
          Consider reviewing changes to the checkout handler.
 
