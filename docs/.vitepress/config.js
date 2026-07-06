@@ -19,7 +19,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'Features', link: '/features/insights' },
-      { text: 'API Reference', link: '/guide/configuration' },
+      { text: 'API Reference', link: '/guide/api-reference' },
       {
         text: 'SDKs',
         items: [
@@ -41,6 +41,7 @@ export default defineConfig({
             { text: 'What is APIForge?', link: '/guide/what-is-apiforge' },
             { text: 'Quick Start', link: '/guide/getting-started' },
             { text: 'Configuration', link: '/guide/configuration' },
+            { text: 'API Reference', link: '/guide/api-reference' },
           ],
         },
         {
